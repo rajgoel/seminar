@@ -7,7 +7,7 @@ var cors = require('cors');
 
 const app = express();
 //app.use(cors());
-//app.use(cors({ credentials: true }));
+app.use(cors({ credentials: true, origin: true }));
 
 const server = http.createServer(app);
 const io = socketio(server);

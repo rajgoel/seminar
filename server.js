@@ -4,6 +4,19 @@ const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
 
+const app = express();
+const server = http.createServer(app);
+//const io = socketio(server);
+const io = socketio(server, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"]
+  }
+});
+
+// Set root for URL
+app.use(express.static(path.join(__dirname, '/www/')));
+
 
 /**
 Authorisation
@@ -59,12 +72,6 @@ function deleteUser(id) {
 	}
 }
 
-const app = express();
-const server = http.createServer(app);
-const io = socketio(server);
-
-// Set root for URL
-app.use(express.static(path.join(__dirname, '/www/')));
 
 // Run when client connects
 io.on('connection', socket => {

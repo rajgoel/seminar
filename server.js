@@ -3,6 +3,7 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
+var cors = require('cors');
 
 const app = express();
 app.use(cors());

@@ -6,7 +6,8 @@ const moment = require('moment');
 var cors = require('cors');
 
 const app = express();
-app.use(cors());
+//app.use(cors());
+app.use(cors({ credentials: true }));
 
 const server = http.createServer(app);
 //const io = socketio(server);

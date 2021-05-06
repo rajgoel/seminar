@@ -3,16 +3,19 @@ const http = require('http');
 const express = require('express');
 const socketio = require('socket.io');
 const moment = require('moment');
-var cors = require('cors');
+//var cors = require('cors');
 
 const app = express();
-app.use(cors());
+//app.use(cors());
 
 const server = http.createServer(app);
 //const io = socketio(server);
 const io = socketio(server, {
   cors: {
-    origins: [ 'https://test.telematique.eu:80' ]
+    origin: "https://test.telematique.eu:80",
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true
   }
 });
 

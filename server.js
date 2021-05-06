@@ -11,18 +11,12 @@ const app = express();
 const server = http.createServer(app);
 //const io = socketio(server);
 const io = socketio(server, {
-  cors: /*{
-    origin: "https://test.telematique.eu:80",
+  cors: {
+    origin: "*",
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
     credentials: true
-  }*/
-{
-  origin: "*",
-  methods: ["GET","HEAD","PUT","PATCH","POST","DELETE"],
-  preflightContinue: false,
-  optionsSuccessStatus: 204
-}
+  }
 });
 
 // Set root for URL

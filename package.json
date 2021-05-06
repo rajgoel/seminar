@@ -16,7 +16,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "cors": "^2.8.5",
-    "socket.io": "^2.4.1",
+    "socket.io": "~2.3.0",
     "moment": "^2.29.1",
     "bcrypt": "^5.0.1"
   },

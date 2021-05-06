@@ -349,6 +349,6 @@ console.log(`${socket.id} disconnected`);
 	});
 });
 
-const PORT = process.env.PORT || 443;
+const PORT = process.env.PORT || 4433;
 
 server.listen(PORT, () => console.log(`Server running on port ${PORT}`));

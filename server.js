@@ -6,7 +6,6 @@ const moment = require('moment');
 var cors = require('cors');
 
 const app = express();
-//app.use(cors());
 app.use(cors({ credentials: true, origin: true }));
 
 const server = http.createServer(app);
@@ -153,15 +152,12 @@ console.log(`${socket.id} enters room "${rooms[i].url}|${rooms[i].name}|${rooms[
 		socket.join( label(rooms[i]) );
 		socket.broadcast.to( label(rooms[i]) ).emit( 'entered_room', { room: rooms[i], user } ); // send to everyone else in room
 		socket.emit( 'participants', { room: rooms[i], hosts: hosts[i], participants: participants[i] } ); // send participant list to user
-//console.log(rooms, hosts, participants);
 		if ( callback ) callback();
 	}
 
 	// Leave room
 	function leaveRoom( i, callback ) {
-//console.log("leaveRoom",i);
 		if ( i === -1 ) {
-//console.log("Room not found");
 			if ( callback ) callback("Room not found");
 			return;
 		}
@@ -182,11 +178,9 @@ console.log(`${socket.id} enters room "${rooms[i].url}|${rooms[i].name}|${rooms[
 		}
 		else {
 			if ( callback ) callback("Only participants can leave a room");
-//console.log("Only participants can leave a room");
 			return false;		
 		}
 
-//console.log(socket.id);		
 		if ( !hosts[i].length ) {
 console.log(`${socket.id} closes room "${rooms[i].url}|${rooms[i].name}|${rooms[i].hash}"`);
 			// close room because user was the last host 
@@ -206,52 +200,26 @@ console.log(`${socket.id} leaves room "${rooms[i].url}|${rooms[i].name}|${rooms[
 			}
 
 		}
-//console.log("Callback:", callback);
 		if ( callback ) callback();
 	}
 
 	// Delete user
 	function leaveAllRooms(id) {
-//console.log("Leave all rooms", id);
 		// leave all rooms the user is
 		for (var i = rooms.length-1; i >= 0; i--) {
-//console.log("Leave room", participants[i],participants[i].findIndex(user => user.id === id));
 			if ( participants[i].findIndex(user => user.id === id) !== -1 ) {
 				leaveRoom( i );
 			}
 		}
 	}
 
-/*
-	// Only close room if user is host
-	function closeRoom( i, callback ) {
-		if ( i === -1 ) {
-			if ( callback ) callback("Room not found");
-			return;
-		}
-		const user = getUser(socket.id);		
-		if ( hosts[i].findIndex(host => host.id === user.id) !== -1 ) {
-console.log(`${socket.id} closes room "${url}|${name}|${hash}"`);
-			socket.broadcast.to( label(rooms[i]) ).emit( 'kicked_out', rooms[i] ); // send to everyone else in room
-			io.sockets.clients( label(rooms[i]) ).forEach( function(client) { client.leave( label(rooms[i]) ) }); // kick out everyone in the room
-			io.emit( 'room_closed', { url: rooms[i].url, name: rooms[i].name } ); // broadcast to everyone
-			deleteRoom(i); 
-		}
-		else {
-			if ( callback ) callback("Only hosts may close rooms");
-		}
-		if ( callback ) callback();
-	}
-*/
 
 	// Send message
 	function sendMessage( type, i, recipient, copy, content, callback ) {
-//console.log("Message:", type, i, recipient, copy, content, hosts[i][0]);
 		if ( recipient === true ) {
 			// make chair the default recipient
 			recipient = hosts[i][0].id;
 		}
-//console.log("Message to ", recipient);
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
 			return;
@@ -261,7 +229,6 @@ console.log(`${socket.id} closes room "${url}|${name}|${hash}"`);
 			// recipient must be participant in the room
 			const j = participants[i].findIndex(participant => participant.id === recipient);
 			if ( j !== -1 ) {
-//console.log("Recipient: " +  recipient,  content);
 				// send to recipient
 				io.to(recipient).emit(type, { time: moment().format('h:mm:ss'), room: rooms[i], sender: user, content: content} );
 				if ( copy ) {
@@ -275,12 +242,10 @@ console.log(`${socket.id} closes room "${url}|${name}|${hash}"`);
 			}
 		}
 		else if ( copy ) {
-//console.log("Recipients: all",  content);
 			// send to everyone in the room
 			io.to( label(rooms[i]) ).emit(type, { time: moment().format('h:mm:ss'), room: rooms[i], sender: user, content: content} );
 		}
 		else {
-//console.log("Recipients: everyone else", content);
 			// send to everyone else in the room
 			socket.to( label(rooms[i]) ).emit(type, { time: moment().format('h:mm:ss'), room: rooms[i], sender: user, content: content} );
 		}
@@ -300,11 +265,7 @@ console.log(`${socket.id} checked out`);
 	socket.on('host_room', ({ url, name, hash, secret }, callback) => {
 		hostRoom( url, name, hash, secret, callback );
 	});
-/*
-	socket.on('close_room', ({ url, name, hash }, callback) => {
-		closeRoom( getRoomIndex(url,name,hash), callback);
-	});
-*/
+
 	socket.on('leave_room', ({ url, name, hash }, callback) => {
 		leaveRoom( getRoomIndex(url,name,hash), callback );
 	});

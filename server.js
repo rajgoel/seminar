@@ -39,12 +39,12 @@ const hosts = [];
 const participants = [];
 
 // Get room index
-function getRoomIndex(url,name,hash) {
-	return rooms.findIndex(room => room.url === url && room.name === name && room.hash === hash);
+function getRoomIndex(venue,name,hash) {
+	return rooms.findIndex(room => room.venue === venue && room.name === name && room.hash === hash);
 }
 
 function label(room) {
-	return room.url + "|" + room.name + "|" + room.hash;
+	return room.venue + "|" + room.name + "|" + room.hash;
 }
 
 // Get user
@@ -89,9 +89,9 @@ console.log(`${socket.id} checked in with name "${name}"`);
 	}
 
 	// Open a new room or join as host
-	function hostRoom( url, name, hash, secret, callback ) {
-		if ( !url ) {
-			if ( callback ) callback("No URL provided");
+	function hostRoom( venue, name, hash, secret, callback ) {
+		if ( !venue ) {
+			if ( callback ) callback("No venue provided");
 			return false;
 		}
 		if ( !name ) {
@@ -109,11 +109,11 @@ console.log(`${socket.id} checked in with name "${name}"`);
 
 
 		const user = getUser(socket.id);
-		const i = getRoomIndex(url,name,hash);
+		const i = getRoomIndex(venue,name,hash);
 
 		if (i !== -1) {
 			// join existing room as host
-console.log(`${socket.id} joins room "${url}|${name}|${hash}" as host`);
+console.log(`${socket.id} joins room "${venue}|${name}|${hash}" as host`);
 			hosts[i].push(user);
 			participants[i].push(user);
 			socket.join( label(rooms[i]) );
@@ -123,13 +123,13 @@ console.log(`${socket.id} joins room "${url}|${name}|${hash}" as host`);
 		}
 		else {
 			// open new room
-console.log(`${socket.id} opens room "${url}|${name}|${hash}"`);
-			room = { url, name, hash };
+console.log(`${socket.id} opens room "${venue}|${name}|${hash}"`);
+			room = { venue, name, hash };
 			rooms.push(room);
 			hosts.push( [ user ] );
 			participants.push( [ user ] );
 			socket.join( label(room) );
-			io.emit( 'room_opened', { url: room.url, name: room.name } ); // broadcast to everyone
+			io.emit( 'room_opened', { venue: room.venue, name: room.name } ); // broadcast to everyone
 			socket.emit( 'chair', room ); // tell host to chair the room
 //console.log(rooms, hosts, participants);
  		}
@@ -145,7 +145,7 @@ console.log(`${socket.id} opens room "${url}|${name}|${hash}"`);
 			return;
 		}
 
-console.log(`${socket.id} enters room "${rooms[i].url}|${rooms[i].name}|${rooms[i].hash}"`);
+console.log(`${socket.id} enters room "${rooms[i].venue}|${rooms[i].name}|${rooms[i].hash}"`);
 		const user = getUser(socket.id);
 		participants[i].push(user);	
 
@@ -182,16 +182,16 @@ console.log(`${socket.id} enters room "${rooms[i].url}|${rooms[i].name}|${rooms[
 		}
 
 		if ( !hosts[i].length ) {
-console.log(`${socket.id} closes room "${rooms[i].url}|${rooms[i].name}|${rooms[i].hash}"`);
+console.log(`${socket.id} closes room "${rooms[i].venue}|${rooms[i].name}|${rooms[i].hash}"`);
 			// close room because user was the last host 
 			socket.broadcast.to( label(rooms[i]) ).emit( 'kicked_out', rooms[i] ); // send to everyone else in room
 			socket.leave( label(rooms[i]) );
 
-			io.emit( 'room_closed', { url: rooms[i].url, name: rooms[i].name } ); // broadcast to everyone
+			io.emit( 'room_closed', { venue: rooms[i].venue, name: rooms[i].name } ); // broadcast to everyone
 			deleteRoom(i);
 		}
 		else {
-console.log(`${socket.id} leaves room "${rooms[i].url}|${rooms[i].name}|${rooms[i].hash}"`);
+console.log(`${socket.id} leaves room "${rooms[i].venue}|${rooms[i].name}|${rooms[i].hash}"`);
 			socket.leave( label(rooms[i]) );
 			// broadcast to everyone in room
 			io.to( label(rooms[i]) ).emit( 'left_room', { room: rooms[i], user } ); 
@@ -262,20 +262,20 @@ console.log(`${socket.id} checked out`);
 		deleteUser(socket.id);
 	});
 
-	socket.on('host_room', ({ url, name, hash, secret }, callback) => {
-		hostRoom( url, name, hash, secret, callback );
+	socket.on('host_room', ({ venue, name, hash, secret }, callback) => {
+		hostRoom( venue, name, hash, secret, callback );
 	});
 
-	socket.on('leave_room', ({ url, name, hash }, callback) => {
-		leaveRoom( getRoomIndex(url,name,hash), callback );
+	socket.on('leave_room', ({ venue, name, hash }, callback) => {
+		leaveRoom( getRoomIndex(venue,name,hash), callback );
 	});
 
-	socket.on('join_room', ({ url, name, hash }, callback) => {
-		enterRoom( getRoomIndex(url,name,hash), callback);
+	socket.on('join_room', ({ venue, name, hash }, callback) => {
+		enterRoom( getRoomIndex(venue,name,hash), callback);
 	});
 
-	socket.on('message', ( {url, name, hash, recipient, copy, content}, callback ) => {
-		const i = getRoomIndex(url,name,hash);
+	socket.on('message', ( {venue, name, hash, recipient, copy, content}, callback ) => {
+		const i = getRoomIndex(venue,name,hash);
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
 			return;
@@ -285,8 +285,8 @@ console.log(`${socket.id} sends message to "${recipient}"`, content);
 		sendMessage( 'message', i, recipient, copy, content, callback );
 	});
 
-	socket.on('announcement', ( {url, name, hash, recipient, copy, content}, callback ) => {
-		const i = getRoomIndex(url,name,hash);
+	socket.on('announcement', ( {venue, name, hash, recipient, copy, content}, callback ) => {
+		const i = getRoomIndex(venue,name,hash);
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
 			return;

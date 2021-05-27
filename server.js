@@ -156,16 +156,7 @@ console.log(`${socket.id} closes room "${rooms[i].venue}|${rooms[i].name}|${room
 		io.emit( 'room_closed', { venue: rooms[i].venue, name: rooms[i].name } ); // broadcast to everyone
 
 		socket.leave( label(rooms[i]) );
-/*
-		io.of('/').in( label(rooms[i]) ).clients((error, socketIds) => {
-			if ( !error ) {
-				socketIds.forEach(socketId => io.sockets.sockets[socketId].leave(label(rooms[i])));
-			}
-			else {
-				socket.leave( label(rooms[i]) );
-			}
-		});
-*/
+
 		deleteRoom(i);
 
 		if ( callback ) callback();

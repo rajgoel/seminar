@@ -88,8 +88,7 @@ console.log(`${socket.id} checked in with name "${name}"`);
 		}
 	}
 
-	// Open a new room or join as host
-	function hostRoom( venue, name, hash, secret, callback ) {
+	function validate(venue, name, hash, secret, callback) {
 		if ( !venue ) {
 			if ( callback ) callback("No venue provided");
 			return false;
@@ -106,7 +105,12 @@ console.log(`${socket.id} checked in with name "${name}"`);
 			if ( callback ) callback("Authorisation failed");
 			return false;
 		}	
+		return true;
+	}
 
+	// Open a new room or join as host
+	function hostRoom( venue, name, hash, secret, callback ) {
+		if ( !validate(venue, name, hash, secret, callback) ) return false;
 
 		const user = getUser(socket.id);
 		const i = getRoomIndex(venue,name,hash);
@@ -136,6 +140,30 @@ console.log(`${socket.id} opens room "${venue}|${name}|${hash}"`);
 
 		if ( callback ) callback();
 		return room;
+	}
+
+	function closeRoom( venue, name, hash, secret, callback ) {
+		if ( !validate(venue, name, hash, secret, callback) ) return false;
+
+		var i = getRoomIndex(venue,name,hash);
+		if ( i === -1 ) {
+			if ( callback ) callback("Room not found");
+			return;
+		}
+
+console.log(`${socket.id} closes room "${rooms[i].venue}|${rooms[i].name}|${rooms[i].hash}"`);
+		io.to( label(rooms[i]) ).emit( 'kicked_out', rooms[i] ); // send to everyone in room
+		io.emit( 'room_closed', { venue: rooms[i].venue, name: rooms[i].name } ); // broadcast to everyone
+
+//		socket.leave( label(rooms[i]) );
+		io.of('/').in( label(rooms[i]) ).clients((error, socketIds) => {
+			socketIds.forEach(socketId => io.sockets.sockets[socketId].leave(label(rooms[i])));
+		});
+
+		deleteRoom(i);
+
+		if ( callback ) callback();
+		return;
 	}
 
 	// Enter room as participant
@@ -264,6 +292,10 @@ console.log(`${socket.id} checked out`);
 
 	socket.on('host_room', ({ venue, name, hash, secret }, callback) => {
 		hostRoom( venue, name, hash, secret, callback );
+	});
+
+	socket.on('close_room', ({ venue, name, hash, secret }, callback) => {
+		closeRoom( venue, name, hash, secret, callback );
 	});
 
 	socket.on('leave_room', ({ venue, name, hash }, callback) => {

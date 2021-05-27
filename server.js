@@ -157,7 +157,12 @@ console.log(`${socket.id} closes room "${rooms[i].venue}|${rooms[i].name}|${room
 
 //		socket.leave( label(rooms[i]) );
 		io.of('/').in( label(rooms[i]) ).clients((error, socketIds) => {
-			socketIds.forEach(socketId => io.sockets.sockets[socketId].leave(label(rooms[i])));
+			if ( !error ) {
+				socketIds.forEach(socketId => io.sockets.sockets[socketId].leave(label(rooms[i])));
+			}
+			else {
+				socket.leave( label(rooms[i]) );
+			}
 		});
 
 		deleteRoom(i);

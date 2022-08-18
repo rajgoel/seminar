@@ -113,6 +113,11 @@ console.log(`${socket.id} checked in with name "${name}"`);
 		if ( !validate(venue, name, hash, secret, callback) ) return false;
 
 		const user = getUser(socket.id);
+		if ( !user ) {
+			callback("User not found!");
+			return false;
+		}
+
 		const i = getRoomIndex(venue,name,hash);
 
 		if (i !== -1) {
@@ -167,11 +172,16 @@ console.log(`${socket.id} closes room "${rooms[i].venue}|${rooms[i].name}|${room
 	function enterRoom( i, callback ) {
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
-			return;
+			return false;
 		}
 
 console.log(`${socket.id} enters room "${rooms[i].venue}|${rooms[i].name}|${rooms[i].hash}"`);
 		const user = getUser(socket.id);
+		if ( !user ) {
+			callback("User not found!");
+			return false;
+		}
+
 		participants[i].push(user);	
 
 		socket.join( label(rooms[i]) );
@@ -184,10 +194,14 @@ console.log(`${socket.id} enters room "${rooms[i].venue}|${rooms[i].name}|${room
 	function leaveRoom( i, callback ) {
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
-			return;
+			return false;
 		}
 
 		const user = getUser(socket.id);
+		if ( !user ) {
+			callback("User not found!");
+			return false;
+		}
 
 		const chair = ( user.id == hosts[i][0].id );
 		// remove user from hosts
@@ -247,9 +261,14 @@ console.log(`${socket.id} leaves room "${rooms[i].venue}|${rooms[i].name}|${room
 		}
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
-			return;
+			return false;
 		}
 		const user = getUser(socket.id);
+		if ( !user ) {
+			callback("User not found!");
+			return false;
+		}
+
 		if ( recipient ) {
 			// recipient must be participant in the room
 			const j = participants[i].findIndex(participant => participant.id === recipient);
@@ -307,7 +326,7 @@ console.log(`${socket.id} checked out`);
 		const i = getRoomIndex(venue,name,hash);
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
-			return;
+			return false;
 		}
 console.log(`${socket.id} sends message to "${recipient}"`, content);
 		// participants can send messages to all participants in the room
@@ -318,7 +337,7 @@ console.log(`${socket.id} sends message to "${recipient}"`, content);
 		const i = getRoomIndex(venue,name,hash);
 		if ( i === -1 ) {
 			if ( callback ) callback("Room not found");
-			return;
+			return false;
 		}
 
 		// hosts can send announcements to all participants in the room

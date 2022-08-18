@@ -1,6 +1,6 @@
 {
   "name": "seminar",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Socket.io platform for hosting seminar rooms",
   "main": "server.js",
   "scripts": {

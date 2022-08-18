@@ -22,7 +22,7 @@ If the path to a key and certificate are provided, an https server is started:
 node server.js <path_to_key.pem> <path_to_cert.pem>
 ```
 
-The key and certificate can be obatined, e.g., by following the instructions on https://certbot.eff.org/instructions.
+The key and certificate can be obtained, e.g., by following the instructions on https://certbot.eff.org/instructions.
 
 
 ## License

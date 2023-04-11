@@ -30,4 +30,4 @@ Make sure to ensure that certificates are renewed when necessary, e.g. by adding
 
 MIT licensed
 
-Copyright (C) 2022 Asvin Goel
+Copyright (C) 2023 Asvin Goel

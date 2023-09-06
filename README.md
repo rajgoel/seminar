@@ -24,7 +24,12 @@ node server.js <path_to_key.pem> <path_to_cert.pem>
 
 The key and certificate can be obtained, e.g., by following the instructions on https://certbot.eff.org/instructions.
 
-Make sure to ensure that certificates are renewed when necessary, e.g. by adding a cronjob. When using automatic renewal, the server may have to be restarted.
+Make sure to ensure that certificates are renewed when necessary, e.g. by adding a cronjob. When using automatic renewal, the server may have to be restarted. To manually (and forcefully) renew certificates using `certbot` you can use 
+
+```
+sudo certbot renew --force-renewal
+```
+
 
 ## License
 

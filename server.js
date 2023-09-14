@@ -357,7 +357,7 @@ console.log(`${socket.id} sends message to "${recipient}"`, content);
 
 		// hosts can send announcements to all participants in the room
 		if ( hosts[i].findIndex(host => host.id === socket.id) !== -1 ) {
-console.log(`${socket.id} makes announcemnet to "${recipient}"`, content);
+console.log(`${socket.id} makes announcement to "${recipient}"`, content);
 			sendMessage( 'announcement', i, recipient, copy, content, callback );
 		}
 		else {

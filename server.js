@@ -280,7 +280,7 @@ console.log(`${socket.id} leaves room "${rooms[i].venue}|${rooms[i].name}|${room
 		}
 		const user = getUser(socket.id);
 		if ( !user ) {
-			callback("User not found!");
+			if ( callback ) callback("User not found!");
 			return false;
 		}
 
